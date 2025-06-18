@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Header Final - Mega Menu Responsivo</title>
+
+  <!-- Importando a fonte Poppins do Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* Regra global que garante que padding e border fiquem dentro do tamanho do elemento */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    /* --- Estilos Gerais --- */
+    body { font-family: 'Poppins', sans-serif; margin: 0; background-color: #f0f0f0; }
+    body.nav-open { overflow: hidden; }
+
+    .header { background-color: #000425; position: relative; z-index: 1000; }
+    
+    .header-container {
+      display: flex; align-items: center; justify-content: space-between;
+      max-width: 1500px; margin: 0 auto; padding: 15px 40px;
+      height: 110px; transition: height 0.3s ease, padding 0.3s ease;
+    }
+    
+    .header-right { display: flex; align-items: center; gap: 50px; }
+    .logo { margin-left: 100px; }
+    .logo a { display: flex; align-items: center; }
+    .logo img { height: 100px; width: auto; transition: height 0.3s ease; }
+    
+    .nav-list { list-style: none; display: flex; gap: 30px; margin: 0; padding: 0; }
+    .nav-list li { position: static; }
+    .nav-list a {
+      color: #ffffff; text-decoration: none; font-size: 16px; font-weight: 300;
+      padding: 10px 5px; transition: color 0.3s ease; display: flex; align-items: center;
+    }
+    .has-submenu > a::after {
+      content: ''; display: inline-block; width: 5px; height: 5px;
+      border-bottom: 1.5px solid #a9a9a9; border-right: 1.5px solid #a9a9a9;
+      transform: translateY(-2px) rotate(45deg); margin-left: 8px; transition: all 0.2s ease;
+    }
+    .nav-list a:hover { color: #a9a9a9; }
+    .nav-list a:hover::after { border-color: #a9a9a9; }
+    
+    a.contact-button {
+      display: inline-block;
+      background-color: #ec781f; color: white; border: none; padding: 14px 32px; border-radius: 5px;
+      font-weight: 300; text-decoration: none; transition: background-color 0.3s ease, transform 0.2s ease; white-space: nowrap;
+    }
+    a.contact-button:hover { background-color: #F7941D; transform: translateY(-2px); }
+    
+    .hamburger-menu {
+      display: none; flex-direction: column; justify-content: space-around;
+      width: 28px; height: 21px; cursor: pointer; z-index: 1002;
+    }
+    .hamburger-menu span {
+      width: 100%; height: 3px; background-color: white; border-radius: 5px;
+      transition: all 0.3s ease-in-out;
+    }
+    
+    /* Layout do painel mobile com Flexbox */
+    .mobile-nav-panel {
+      position: fixed; top: 0; right: -100%; width: 80%; max-width: 320px;
+      height: 100vh;
+      background-color: #000425; box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+      z-index: 1001; 
+      display: flex; 
+      flex-direction: column;
+      padding: 80px 0 20px;
+      transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    
+    .mobile-nav-links { 
+      list-style: none; padding: 0; margin: 0; text-align: left; width: 100%;
+      flex: 1;
+      overflow-y: auto;
+      padding-bottom: 20px;
+    }
+    
+    .mobile-nav-links li { margin-bottom: 5px; }
+    .mobile-nav-links > li > a {
+      color: white; text-decoration: none; font-size: 20px; font-weight: 400;
+      padding: 15px 25px; display: flex; justify-content: space-between; align-items: center;
+    }
+
+    .mobile-contact-button { 
+      padding: 0 25px; 
+      text-align: center;
+      margin-top: 20px;
+      flex-shrink: 0;
+    }
+    
+    .mobile-nav-links .arrow {
+      width: 10px; height: 10px; border-right: 2px solid #a9a9a9;
+      border-bottom: 2px solid #a9a9a9; transform: rotate(45deg); transition: transform 0.3s ease;
+    }
+    li.is-open > a > .arrow { transform: rotate(225deg); }
+    
+    .mobile-submenu {
+      list-style: none; padding-left: 0; margin: 0;
+      background-color: rgba(0,0,0,0.2);
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease-out;
+    }
+    /* --- CORREÇÃO APLICADA AQUI --- */
+    li.is-open > .mobile-submenu {
+      max-height: 1000px; /* Aumentado para caber todos os itens novos */
+      transition: max-height 0.6s ease-in;
+    }
+    .mobile-submenu a {
+      color: #d1d1d1; text-decoration: none; font-size: 16px;
+      padding: 10px 35px; display: block;
+    }
+    .mobile-submenu a:hover { background-color: rgba(255,255,255,0.1); }
+    
+    .mobile-submenu-header {
+      color: #ec781f;
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      padding: 20px 35px 5px;
+      margin-top: 10px;
+      letter-spacing: 0.5px;
+    }
+    .mobile-submenu-header:first-of-type {
+      margin-top: 0;
+      padding-top: 15px;
+    }
+
+    .close-menu-btn {
+      position: absolute; top: 20px; right: 25px;
+      font-size: 35px; color: white; cursor: pointer; line-height: 1;
+    }
+
+    /* Estrutura do Mega Menu (Desktop) */
+    .submenu-wide { display: none; position: absolute; top: 110px; left: 0; width: 100%; background-color: #000425; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); border-top: 1px solid #000425; z-index: 999; }
+    .submenu-content { display: flex; max-width: 1250px; margin: 0 auto; padding: 40px 20px; gap: 0; align-items: stretch; }
+    .submenu-col.description { flex: 0 0 300px; display: flex; align-items: center; justify-content: center; padding: 20px 40px 20px 20px; border-right: 1px solid #333; }
+    .submenu-col.description h3 { position: relative; font-size: 28px; font-weight: 300; color: white; margin: 0; padding-left: 25px; }
+    .submenu-col.description h3::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); height: 40px; width: 5px; background-color: #ec781f; }
+    .submenu-col.image-card { flex: 0 0 350px; position: relative; border-radius: 5px; overflow: hidden; height: 290px; }
+    .image-card img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+    .image-card:hover img { transform: scale(1.05); }
+    .submenu-col.links { flex: 1; display: flex; flex-direction: row; justify-content: flex-start; align-items: center; padding: 0 40px; }
+    .link-column { display: flex; flex-direction: column; gap: 10px; }
+    .submenu-col.links a { display: block; color: white; text-decoration: none; padding: 10px 15px; border-radius: 5px; font-size: 15px; font-weight: 500; transition: color 0.2s ease, background-color 0.2s ease; white-space: nowrap; }
+    .submenu-col.links a:hover { color: #F7941D; }
+    #submenu-servicos .link-column { gap: 10px; }
+    #submenu-servicos .submenu-col.links a { padding: 6px 15px; }
+    #submenu-atuacao .submenu-content { gap: 40px; }
+    .submenu-col-interactive { flex: 1; display: flex; gap: 30px; }
+    .atuacao-titles-col { flex: 0 0 300px; border-right: 1px solid #333; padding-right: 30px; display: flex; flex-direction: column; justify-content: center; }
+    .atuacao-links-col { flex: 1; display: flex; align-items: center; }
+    .atuacao-title-item { color: #a9a9a9; font-size: 20px; font-weight: 300; padding: 15px 20px; border-radius: 5px; cursor: pointer; transition: all 0.3s ease; position: relative; padding-left: 35px; }
+    .atuacao-title-item:hover { background-color: #ec781f20; color: white; }
+    .atuacao-title-item.active { color: white; font-weight: 300; background-color: transparent; }
+    .atuacao-title-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); height: 30px; width: 5px; background-color: #ec781f; }
+    .row-links { display: none; width: 100%; }
+    .row-links.active { display: flex; }
+    .row-links.single-column { flex-direction: column; gap: 12px; }
+    .row-links.multi-column { flex-direction: row; gap: 15px; }
+    .row-links.multi-column .link-column { flex: 1; }
+    .row-links a { display: block; color: white; text-decoration: none; padding: 8px 15px; border-radius: 5px; font-size: 15px; font-weight: 500; transition: background-color 0.2s ease, color 0.2s ease; }
+    .row-links a:hover { background-color: #000425; color: #F7941D; }
+
+    /* --- ESTILOS RESPONSIVOS --- */
+    @media (max-width: 1024px) {
+      .header-container { height: 80px; padding: 10px 20px; }
+      .logo { margin-left: 0; }
+      .logo img { height: 60px; }
+      .header-right nav, .header-right a.contact-button { display: none; }
+      .hamburger-menu { display: flex; }
+      .has-submenu > a::after { display: none; }
+    }
+    
+    .nav-open .hamburger-menu span:nth-child(1) { transform: translateY(9px) rotate(45deg); }
+    .nav-open .hamburger-menu span:nth-child(2) { opacity: 0; }
+    .nav-open .hamburger-menu span:nth-child(3) { transform: translateY(-9px) rotate(-45deg); }
+    .nav-open .mobile-nav-panel { right: 0; }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-container">
+      <div class="logo">
+        <a href="#"><img src="https://formacaoprofissionalunhas.com.br/wp-content/uploads/2025/06/Versao-Final-Logo-e-Isotipo-8-scaled.png" alt="Logo da Empresa" /></a>
+      </div>
+      <div class="header-right">
+        <nav>
+          <ul class="nav-list">
+            <li><a href="#">Início</a></li>
+            <li class="has-submenu" data-target="submenu-sobre"><a href="#">Quem Somos</a></li>
+            <li class="has-submenu" data-target="submenu-servicos"><a href="#">O que fazemos</a></li>
+            <li class="has-submenu" data-target="submenu-atuacao"><a href="#">Áreas de Atuação</a></li>
+          </ul>
+        </nav>
+        <a href="#" class="contact-button" target="_blank">Fale com um especialista</a>
+        
+        <div class="hamburger-menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Mega Menus -->
+    <div id="submenu-sobre" class="submenu-wide">
+      <div class="submenu-content">
+        <div class="submenu-col description"><h3>Quem Somos</h3></div>
+        <div class="submenu-col links">
+          <div class="link-column">
+            <a href="#">Nossa História</a>
+            <a href="#">Trabalhe Conosco</a>
+            <a href="#">Política de Privacidade</a>
+          </div>
+        </div>
+        <div class="submenu-col image-card">
+          <img src="https://axxis.formacaoprofissionalunhas.com.br/wp-content/uploads/2025/06/freepik__the-style-is-candid-image-photography-with-natural__76200.jpeg" alt="Imagem corporativa" />
+        </div>
+      </div>
+    </div>
+    <div id="submenu-servicos" class="submenu-wide">
+      <div class="submenu-content">
+        <div class="submenu-col description"><h3>O que fazemos</h3></div>
+        <div class="submenu-col links">
+          <div class="link-column">
+            <a href="#">Contabilidade Digital</a>
+            <a href="#">Contabilidade Consultiva</a>
+            <a href="#">BPO Financeiro</a>
+            <a href="#">BPO de RH</a>
+            <a href="#">BPO Jurídico</a>
+          </div>
+        </div>
+        <div class="submenu-col image-card">
+          <img src="https://axxis.formacaoprofissionalunhas.com.br/wp-content/uploads/2025/06/freepik__office-meeting-a-hint-of-orange-in-the-presentatio__76201.jpeg" alt="Nossos serviços" />
+        </div>
+      </div>
+    </div>
+    <div id="submenu-atuacao" class="submenu-wide">
+      <div class="submenu-content">
+        <div class="submenu-col-interactive">
+          <div class="atuacao-titles-col">
+              <div class="atuacao-title-item active" data-target="links-segmentos">Segmentos Empresariais</div>
+              <div class="atuacao-title-item" data-target="links-setores">Setores Econômicos</div>
+              <div class="atuacao-title-item" data-target="links-regimes">Regimes Tributários</div>
+          </div>
+          <div class="atuacao-links-col">
+              <div class="row-links multi-column active" id="links-segmentos">
+                  <div class="link-column">
+                      <a href="#">Academias</a><a href="#">Escolas</a><a href="#">S/As</a><a href="#">Fundos de Invest.</a>
+                  </div>
+                  <div class="link-column">
+                      <a href="#">Holdings</a><a href="#">Startups</a><a href="#">Incorporadoras</a><a href="#">Tecnologia</a>
+                  </div>
+              </div>
+              <div class="row-links single-column" id="links-setores">
+                  <div class="link-column">
+                    <a href="#">Comércio</a><a href="#">Serviços</a><a href="#">Saúde</a><a href="#">Terceiro Setor</a>
+                  </div>
+              </div>
+              <!-- --- CORREÇÃO DE CONTEÚDO APLICADA AQUI (DESKTOP) --- -->
+              <div class="row-links single-column" id="links-regimes">
+                  <div class="link-column">
+                    <a href="#">Simples Nacional</a><a href="#">Lucro Presumido</a><a href="#">Lucro Real</a><a href="#">Imunes e Isentas</a><a href="#">MEI (Microempreendedor)</a><a href="#">Regime de Caixa</a><a href="#">Regime de Competência</a><a href="#">Outros Regimes</a>
+                  </div>
+              </div>
+          </div>
+        </div>
+        <div class="submenu-col image-card">
+            <img src="https://axxis.formacaoprofissionalunhas.com.br/wp-content/uploads/2025/06/empresario-bonito-trabalhando-no-escritorio-scaled.jpg" alt="Segmentos de mercado" />
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="mobile-nav-panel">
+    <div class="close-menu-btn">×</div>
+    <ul class="mobile-nav-links">
+        <li><a href="#">Início</a></li>
+        <li class="has-mobile-submenu">
+          <a href="#">Quem Somos <span class="arrow"></span></a>
+          <ul class="mobile-submenu">
+            <li><a href="#">Nossa História</a></li>
+            <li><a href="#">Trabalhe Conosco</a></li>
+            <li><a href="#">Política de Privacidade</a></li>
+          </ul>
+        </li>
+        <li class="has-mobile-submenu">
+          <a href="#">O que fazemos <span class="arrow"></span></a>
+          <ul class="mobile-submenu">
+            <li><a href="#">Contabilidade Digital</a></li>
+            <li><a href="#">Contabilidade Consultiva</a></li>
+            <li><a href="#">BPO Financeiro</a></li>
+            <li><a href="#">BPO de RH</a></li>
+            <li><a href="#">BPO Jurídico</a></li>
+          </ul>
+        </li>
+        <li class="has-mobile-submenu">
+          <a href="#">Áreas de Atuação <span class="arrow"></span></a>
+          <ul class="mobile-submenu">
+            <li class="mobile-submenu-header">Segmentos Empresariais</li>
+            <li><a href="#">Academias</a></li>
+            <li><a href="#">Escolas</a></li>
+            <li><a href="#">S/As</a></li>
+            <li><a href="#">Fundos de Invest.</a></li>
+            <li><a href="#">Holdings</a></li>
+            <li><a href="#">Startups</a></li>
+            <li><a href="#">Incorporadoras</a></li>
+            <li><a href="#">Tecnologia</a></li>
+            
+            <li class="mobile-submenu-header">Setores Econômicos</li>
+            <li><a href="#">Comércio</a></li>
+            <li><a href="#">Serviços</a></li>
+            <li><a href="#">Saúde</a></li>
+            <li><a href="#">Terceiro Setor</a></li>
+
+            <!-- --- CORREÇÃO DE CONTEÚDO APLICADA AQUI (MOBILE) --- -->
+            <li class="mobile-submenu-header">Regimes Tributários</li>
+            <li><a href="#">Simples Nacional</a></li>
+            <li><a href="#">Lucro Presumido</a></li>
+            <li><a href="#">Lucro Real</a></li>
+            <li><a href="#">Imunes e Isentas</a></li>
+         
+          </ul>
+        </li>
+    </ul>
+    <div class="mobile-contact-button">
+      <a href="#" class="contact-button" target="_blank">Fale com um especialista</a>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const header = document.querySelector('.header');
+      const submenus = document.querySelectorAll('.submenu-wide');
+      const menuItems = document.querySelectorAll('.has-submenu');
+      const atuacaoTitles = document.querySelectorAll('.atuacao-title-item');
+      const atuacaoLinkPanels = document.querySelectorAll('#submenu-atuacao .row-links');
+      const hamburger = document.querySelector('.hamburger-menu');
+      const closeBtn = document.querySelector('.close-menu-btn');
+      const body = document.body;
+      let timeoutId;
+
+      // Lógica do Mega Menu de Desktop
+      function hideAllSubmenus() { submenus.forEach(submenu => { submenu.style.display = 'none'; }); }
+      menuItems.forEach(item => {
+        item.addEventListener('mouseenter', function () {
+          clearTimeout(timeoutId);
+          hideAllSubmenus();
+          const targetId = this.dataset.target;
+          const targetSubmenu = document.getElementById(targetId);
+          if (targetSubmenu) { targetSubmenu.style.display = 'block'; }
+        });
+      });
+      header.addEventListener('mouseleave', function () { timeoutId = setTimeout(hideAllSubmenus, 200); });
+      atuacaoTitles.forEach(title => {
+        title.addEventListener('mouseenter', function() {
+          atuacaoTitles.forEach(t => t.classList.remove('active'));
+          atuacaoLinkPanels.forEach(p => p.classList.remove('active'));
+          this.classList.add('active');
+          const targetPanelId = this.dataset.target;
+          const targetPanel = document.getElementById(targetPanelId);
+          if (targetPanel) { targetPanel.classList.add('active'); }
+        });
+      });
+
+      // Lógica do Menu Responsivo
+      const mobileSubmenuToggles = document.querySelectorAll('.mobile-nav-links .has-mobile-submenu > a');
+      function openMobileMenu() { body.classList.add('nav-open'); }
+      function closeMobileMenu() { body.classList.remove('nav-open'); }
+      hamburger.addEventListener('click', openMobileMenu);
+      closeBtn.addEventListener('click', closeMobileMenu);
+      
+      mobileSubmenuToggles.forEach(toggle => {
+        toggle.addEventListener('click', function(e) {
+          e.preventDefault();
+          const parentLi = this.parentElement;
+          const wasOpen = parentLi.classList.contains('is-open');
+          
+          mobileSubmenuToggles.forEach(otherToggle => {
+            otherToggle.parentElement.classList.remove('is-open');
+          });
+          
+          if (!wasOpen) {
+            parentLi.classList.add('is-open');
+          }
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>
